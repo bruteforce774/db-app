@@ -32,7 +32,7 @@ app.put("/api/users/:id", (req, res) => {
   db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, req.params.id);
   const user = db.prepare("SELECT * FROM users where id = ?").get(req.params.id);
   res.json(user);
-}
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
