@@ -1,8 +1,12 @@
-import { useActionState, useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import axios from "axios";
 
 export default function UserModal({ user, onUserUpdated, onClose }) {
   const dialogRef = useRef(null);
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [error, setError] = useState(null);
+  const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -11,37 +15,41 @@ export default function UserModal({ user, onUserUpdated, onClose }) {
     return () => dialog.removeEventListener("close", onClose);
   }, []);
 
-  const [state, dispatchAction, isPending] = useActionState(
-    async (prevState, formData) => {
-      const name = formData.get("name");
-      const email = formData.get("email");
-
-      await axios.put(`http://localhost:3001/api/users/${user.id}`, {
-        name,
-        email,
-      });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsPending(true);
+    try {
+      await axios.put(`/apps/db-app/api/users/user.php?id=${user.id}`, { name, email });
       await onUserUpdated();
       onClose();
-
-      return { error: null };
-    },
-    { error: null },
-  );
+    } catch (err) {
+      setError("Failed to update user.");
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <dialog ref={dialogRef}>
       <h2>Edit User</h2>
-      <form action={dispatchAction}>
-        <input name="name" defaultValue={user.name} required />
-        <input name="email" defaultValue={user.email} required />
+      <form onSubmit={handleSubmit}>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         <button type="submit" disabled={isPending}>
           {isPending ? "Saving..." : "Save"}
         </button>
-        <button type="button" onClick={onClose}>
-          Cancel
-        </button>
+        <button type="button" onClick={onClose}>Cancel</button>
       </form>
-      {state.error && <p>{state.error}</p>}
+      {error && <p>{error}</p>}
     </dialog>
   );
 }

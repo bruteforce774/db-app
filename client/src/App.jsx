@@ -4,13 +4,15 @@ import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
 import UserModal from "./components/UserModal";
 
+const API = "/apps/db-app/api/users/index.php";
+
 export default function App() {
   const [users, setUsers] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:3001/api/users");
+    const res = await axios.get(API);
     setUsers(res.data);
   };
 
@@ -19,7 +21,7 @@ export default function App() {
   }, []);
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:3001/api/users/${id}`);
+    await axios.delete(`/apps/db-app/api/users/user.php?id=${id}`);
     await fetchUsers();
   };
 

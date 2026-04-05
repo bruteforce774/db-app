@@ -1,25 +1,48 @@
-import { useActionState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
+const API = "/apps/db-app/api/users/index.php";
+
 export default function UserForm({ onUserAdded }) {
-  const [state, dispatchAction, isPending] = useActionState(async (prevState, formData) => {
-    const name = formData.get("name");
-    const email = formData.get("email");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState(null);
+  const [isPending, setIsPending] = useState(false);
 
-    await axios.post("http://localhost:3001/api/users", { name, email });
-    await onUserAdded();
-
-    return { error: null };
-  }, { error: null });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsPending(true);
+    try {
+      await axios.post(API, { name, email });
+      setName("");
+      setEmail("");
+      await onUserAdded();
+    } catch (err) {
+      setError("Failed to add user.");
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
-    <form action={dispatchAction}>
-      <input name="name" placeholder="Name" required />
-      <input name="email" placeholder="Email" required />
+    <form onSubmit={handleSubmit}>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+        required
+      />
+      <input
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
       <button type="submit" disabled={isPending}>
         {isPending ? "Adding..." : "Add User"}
       </button>
-      {state.error && <p>{state.error}</p>}
+      {error && <p>{error}</p>}
     </form>
   );
 }
