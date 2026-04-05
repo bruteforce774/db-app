@@ -16,10 +16,17 @@ app.get("/api/users", async (req, res) => {
 app.post("/api/users", (req, res) => {
   const { name, email } = req.body;
 
-  const result = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)").run(name, email);
-  const user = db.prepare("SELECT * FROM users where id = ?").get(result.lastInsertRowid);
+  const [result] = await db.execute(
+    "INSERT INTO users (name, email) VALUES (?, ?)",
+    [name, email]
+  );
 
-  res.status(201).json(user);
+  const [rows] = await db.execute(
+    "SELECT * FROM users WHERE id = ?",
+    [result.insertId]
+  );
+
+  res.status(201).json(rows[0]);
 });
 
 app.delete("/api/users/:id", (req, res) => {
