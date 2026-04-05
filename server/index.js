@@ -8,8 +8,8 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/users", (req, res) => {
-  const users = db.prepare("SELECT * FROM users").all();
+app.get("/api/users", async (req, res) => {
+  const [rows] = await db.execute("SELECT * FROM users");
   res.json(users);
 });
 
