@@ -10,10 +10,10 @@ app.use(express.json());
 
 app.get("/api/users", async (req, res) => {
   const [rows] = await db.execute("SELECT * FROM users");
-  res.json(users);
+  res.json(rows);
 });
 
-app.post("/api/users", (req, res) => {
+app.post("/api/users", async (req, res) => {
   const { name, email } = req.body;
 
   const [result] = await db.execute(
@@ -30,7 +30,7 @@ app.post("/api/users", (req, res) => {
 });
 
 app.delete("/api/users/:id", (req, res) => {
-  db.prepare("DELETE FROM users WHERE id = ?").run(req.params.id);
+  await db.execute("DELETE FROM users WHERE id = ?", [req.params.id]);
   res.status(204).send();
 })
 
