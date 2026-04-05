@@ -34,11 +34,19 @@ app.delete("/api/users/:id", (req, res) => {
   res.status(204).send();
 })
 
-app.put("/api/users/:id", (req, res) => {
+app.put("/api/users/:id", async (req, res) => {
   const { name, email } = req.body;
-  db.prepare("UPDATE users SET name = ?, email = ? WHERE id = ?").run(name, email, req.params.id);
-  const user = db.prepare("SELECT * FROM users where id = ?").get(req.params.id);
-  res.json(user);
+
+  await db.execute(
+    "UPDATE users SET name = ?, email = ? WHERE id = ?",
+    [name, email, req.params.id]
+  );
+  const [rows] = await db.execute(
+    "SELECT * FROM users WHERE id = ?",
+    [req.params.id]
+  );
+
+  res.json(rows[0]);
 });
 
 app.listen(port, () => {
