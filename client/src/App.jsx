@@ -15,7 +15,7 @@ export default function App() {
 
   const [state, dispatchAction, isPending] = useActionState(async (prevState, formData) => {
     const name = formData.get("name");
-    const email = formData.get("name");
+    const email = formData.get("email");
 
     await axios.post("http://localhost:3001/api/users", { name, email });
     await fetchUsers();
