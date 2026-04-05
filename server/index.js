@@ -22,6 +22,11 @@ app.post("/api/users", (req, res) => {
   res.status(201).json(user);
 });
 
+app.delete("/api/users/:id", (req, res) => {
+  db.prepare("DELETE FROM users WHERE id = ?").run(req.params.id);
+  res.status(204).send();
+})
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 })
