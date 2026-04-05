@@ -1,8 +1,12 @@
-import { useState, useEffect, useActionState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import UserForm from "./components/UserForm";
+import UserList from "./components/UserList";
 
 export default function App() {
   const [users, setUsers] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchUsers = async () => {
     const res = await axios.get("http://localhost:3001/api/users");
@@ -16,39 +20,18 @@ export default function App() {
   const handleDelete = async (id) => {
     await axios.delete(`http://localhost:3001/api/users/${id}`);
     await fetchUsers();
-  }
+  };
 
-  const [state, dispatchAction, isPending] = useActionState(async (prevState, formData) => {
-    const name = formData.get("name");
-    const email = formData.get("email");
-
-    await axios.post("http://localhost:3001/api/users", { name, email });
-    await fetchUsers();
-
-    return { error: null };
-  }, {error: null });
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
 
   return (
     <div>
       <h1>Users</h1>
-
-      <form action={dispatchAction}>
-        <input name="name" placeholder="Name" required />
-        <input name="email" placeholder="Email" required />
-        <button type="submit" disabled={isPending}>
-          {isPending ? "Adding..." : "Add User"}
-        </button>
-        {state.error && <p>{state.error}</p>}
-      </form>
-
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            {user.name} - {user.email}
-            <button onClick={() => handleDelete(user.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <UserForm onUserAdded={fetchUsers} />
+      <UserList users={users} onDelete={handleDelete} onEdit={handleEdit} />
     </div>
   );
 }
