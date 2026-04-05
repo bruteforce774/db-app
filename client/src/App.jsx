@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
+import UserModal from "./components/UserModal";
 
 export default function App() {
   const [users, setUsers] = useState([]);
@@ -32,6 +33,13 @@ export default function App() {
       <h1>Users</h1>
       <UserForm onUserAdded={fetchUsers} />
       <UserList users={users} onDelete={handleDelete} onEdit={handleEdit} />
+      {modalOpen && selectedUser && (
+        <UserModal
+          user={selectedUser}
+          onUserUpdated={fetchUsers}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
