@@ -13,6 +13,11 @@ export default function App() {
     fetchUsers();
   }, []);
 
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:3001/api/users/${id}`);
+    await fetchUsers();
+  }
+
   const [state, dispatchAction, isPending] = useActionState(async (prevState, formData) => {
     const name = formData.get("name");
     const email = formData.get("email");
