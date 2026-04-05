@@ -43,7 +43,10 @@ export default function App() {
 
       <ul>
         {users.map((user) => (
-          <li key={user.id}>{user.name} - {user.email}</li>
+          <li key={user.id}>
+            {user.name} - {user.email}
+            <button onClick={() => handleDelete(user.id)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>
