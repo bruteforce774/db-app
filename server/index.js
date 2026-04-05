@@ -29,7 +29,7 @@ app.post("/api/users", async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-app.delete("/api/users/:id", (req, res) => {
+app.delete("/api/users/:id", async (req, res) => {
   await db.execute("DELETE FROM users WHERE id = ?", [req.params.id]);
   res.status(204).send();
 })

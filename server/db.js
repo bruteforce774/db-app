@@ -1,4 +1,5 @@
-import "dotenv/config";
+import { config } from "dotenv"; 
+config({ path: "./server/.env" });
 import mysql from "mysql2/promise";
 
 const db = await mysql.createConnection({
