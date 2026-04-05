@@ -1,0 +1,27 @@
+import express from "express";
+import cors from "cors";
+import db from "./db.js";
+
+const app = express();
+const port = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/api/users", (req, res) => {
+  const users = db.prepare("SELECT * FROM users").all();
+  res.json(users);
+});
+
+app.post("/api/users", (req, res) => {
+  const { name, email } = req.body;
+
+  const result = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)").run(name, email);
+  const user = db.prepare("SELECT * FROM users where id = ?").get(result.lastInsertRowid);
+
+  res.status(201).json(user);
+});
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+})
